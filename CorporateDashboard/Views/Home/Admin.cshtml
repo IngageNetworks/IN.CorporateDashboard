@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Admin</h2>
+
+@using(Html.BeginForm())
+{
+    <label for="message">Message</label>
+    <input type="text" id="message" name="message" style="width:98%;" value="This is a message."/>
+}
+
+<div><input id="showMessageCheckbox" type="checkbox" /> Show Message</div>
+<div><input id="showAlertCheckbox" type="checkbox" /> Show Alert</div>
+<div><input id="showWeatherCheckbox" type="checkbox" /> Show Additional Info</div>
+<div id="status" style="color:#aaa"></div>
+
+<script type="text/javascript" src="/signalr/hubs"></script>
+<script type="text/javascript">
+    var hub;
+    var lastMessage;
+
+    $(function () {
+        $('#status').text('starting...');
+        
+        hub = $.connection.dashboardHub;
+        $("#message").change(function () { broadcastMessage(false); });
+
+        $("#sendMessageButton").click(broadcastMessage);
+        $("#showMessageButton").click(showMessage);
+        $("#hideMessageButton").click(hideMessage);
+        $("#showAlertCheckbox").change(showAlertCheckboxChanged);
+        $("#showMessageCheckbox").change(showMessageCheckboxChanged);
+        $("#showWeatherCheckbox").change(showWeatherCheckboxChanged);
+        
+        $.connection.hub.start(function () { $('#status').text(''); setInterval("broadcastMessage(false)", 100); });
+    });
+    
+    function broadcastMessage(force) {
+        var message = $('#message').val();
+
+        if (message != lastMessage || force == true) {
+            hub.broadcastMessage(message, force);
+            lastMessage = message;
+        }
+
+        return false;
+    }
+
+    function showMessage() {
+        lastMessage = '~~~';
+        hub.showMessage('test');
+        broadcastMessage();
+        return false;
+    }
+
+    function hideMessage() {
+        hub.hideMessage('test');
+        return false;
+    }
+    
+    function showAlertCheckboxChanged() {
+        if ($(this).attr('checked')) {
+            hub.showAlert('test');
+        } else
+            hub.hideAlert('test');
+    }
+    
+    function showMessageCheckboxChanged() {
+        if ($(this).attr('checked')) {
+            hub.showMessage('test');
+            broadcastMessage(true);
+        } else
+            hub.hideMessage('test');
+    }
+
+    function showWeatherCheckboxChanged() {
+        if ($(this).attr('checked')) {
+            hub.showWeather('test');
+        } else
+            hub.hideWeather('test');
+    }
+</script>

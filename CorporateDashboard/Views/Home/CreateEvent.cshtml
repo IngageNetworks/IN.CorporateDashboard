@@ -1,0 +1,67 @@
+@model CorporateDashboard.Models.Event
+
+@{
+    ViewBag.Title = "Create Event";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title</h1>
+</hgroup>
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+@using (Html.BeginForm("JsonCreateEvent", "Home", FormMethod.Post, new Dictionary<string, object> {{"id", "theform"}})) {
+    @Html.ValidationSummary(true, "Event creation was unsuccessful. Please correct the errors and try again.")
+
+    <fieldset>
+        <legend>Create Event</legend>
+        <ol>
+            <li>
+                @Html.LabelFor(m => m.Title)
+                @Html.TextBoxFor(m => m.Title)
+                @Html.ValidationMessageFor(m => m.Title)
+            </li>
+            <li>
+                @Html.LabelFor(m => m.Location)
+                @Html.TextBoxFor(m => m.Location)
+                @Html.ValidationMessageFor(m => m.Location)
+            </li>
+            <li>
+                @Html.LabelFor(m => m.Date)
+                @Html.TextBoxFor(m => m.Date)
+                @Html.ValidationMessageFor(m => m.Date)
+            </li>
+        </ol>
+        <input type="submit" value="Publish" /> <span id="formResult" style="color:#700"></span>
+    </fieldset>
+}
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#Title').focus();
+
+        $('#theform').submit(function () {
+            $('#formResult').html('');
+
+            $.ajax({
+                type: 'POST',
+                url: 'JsonCreateEvent',
+                data: $('#theform').serialize(),
+                success: function (data, textStatus, xhr) {
+                    if (data.StatusCode == 201) {
+                        $('#formResult').css('color', '#070');
+                        $('#formResult').html('Event post was created!');
+                        $('input[type=text],textarea').val('');
+                        $('#Title').focus();
+                    } else {
+                        $('#formResult').css('color', '#700');
+                        $('#formResult').html(data.Message);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>

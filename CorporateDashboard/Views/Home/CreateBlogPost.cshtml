@@ -1,0 +1,62 @@
+@model CorporateDashboard.Models.BlogPost
+
+@{
+    ViewBag.Title = "Create Blog Post";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title</h1>
+</hgroup>
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+@using (Html.BeginForm("JsonCreateBlogPost", "Home", FormMethod.Post, new Dictionary<string, object> {{"id", "theform"}})) {
+    @Html.ValidationSummary(true, "Blog post creation was unsuccessful. Please correct the errors and try again.")
+
+    <fieldset>
+        <legend>Create Blog Post</legend>
+        <ol>
+            <li>
+                @Html.LabelFor(m => m.Title)
+                @Html.TextBoxFor(m => m.Title)
+                @Html.ValidationMessageFor(m => m.Title)
+            </li>
+            <li>
+                @Html.LabelFor(m => m.Body)
+                @Html.TextAreaFor(m => m.Body)
+                @Html.ValidationMessageFor(m => m.Body)
+            </li>
+        </ol>
+        <input type="submit" value="Publish" /> <span id="formResult" style="color:#700"></span>
+    </fieldset>
+}
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#Title').focus();
+        
+        $('#theform').submit(function () {
+            $('#formResult').html('');
+
+            $.ajax({
+                type: 'POST',
+                url: 'JsonCreateBlogPost',
+                data: $('#theform').serialize(),
+                success: function (data, textStatus, xhr) {
+                    if (data.StatusCode == 201) {
+                        $('#formResult').css('color', '#070');
+                        $('#formResult').html('Blog post was created!');
+                        $('input[type=text],textarea').val('');
+                        $('#Title').focus();
+                    } else {
+                        $('#formResult').css('color', '#700');
+                        $('#formResult').html(data.Message);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
