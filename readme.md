@@ -7,3 +7,7 @@ The dashboard would be displayed on a large screen in an office, showing the lat
 APIs
 ---
 IN.CorporateDashboard uses [**INgage Enterprise Platform**](http://developer.ingagenetworks.com/)'s Blog, Event, and Container APIs.
+
+Screenshot
+---
+![Screenshot](https://github.com/IngageNetworks/IN.CorporateDashboard/raw/master/Documentation/screenshot.png)
